@@ -113,11 +113,17 @@ class Program
 
     static void BeginMCMove()
     {
-        Console.WriteLine("Moving ZIP To Mc Folder...");
-        File.Move("TrxshScriptedTotem.zip", GetMC() + "TrxshScriptedTotem.zip");
-        Console.WriteLine("Moved!");
-
-        finish();
+        try
+        {
+            Console.WriteLine("Moving ZIP To Mc Folder...");
+            File.Move("TrxshScriptedTotem.zip", GetMC() + "TrxshScriptedTotem.zip");
+            Console.WriteLine("Moved!");
+            finish();
+        }
+        catch(IOException e)
+        {
+            failed(e);
+        }
     }
 
     static void finish()
@@ -127,6 +133,15 @@ class Program
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("Success!!");
         Console.WriteLine("Run Minecraft And Set The Texture Pack At Highest Priority 'TrxshScriptedTotem'");
+    }
+
+    static void failed(object stacktrace)
+    {
+        Console.Clear();
+        Console.Beep();
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("The Operation Failed. Please Try Again." + "\n" + stacktrace);
+        while (true) ;
     }
 
     static void FileChecks()
@@ -159,7 +174,7 @@ class Program
                 Console.WriteLine("Deleted MC Pack.");
             }catch(IOException e)
             {
-                Console.WriteLine(new IOException("Failed To Hook To Minecraft Folder! Is Minecraft Currently Running?") + "\n" + e.StackTrace);
+                failed(new IOException("Failed To Hook To Minecraft Folder! Is Minecraft Currently Running?" + "\n" + "The Application Will Not Run Properly If Minecraft Is Not Closed.") + "\n" + e.Message + "\n" + e.StackTrace);
             }
         }
     }
