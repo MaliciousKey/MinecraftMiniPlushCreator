@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
@@ -31,7 +31,7 @@ class Program
 
             if(IsValidUsername())
             {
-                Console.WriteLine("Starting Download Of Pack Prequisite");
+                Console.WriteLine("Creating Files For Prequisite");
 
                 //register event
                 WebClient client = new WebClient();
@@ -54,10 +54,17 @@ class Program
 
     static void ExtractPack()
     { 
-        Console.WriteLine("Extracting File...");
-        ZipFile.ExtractToDirectory(fileName, newDirName + "/");
-        Console.WriteLine("Extracted!");
-        a();
+        try
+        {
+            Console.WriteLine("Extracting File...");
+            ZipFile.ExtractToDirectory(fileName, newDirName + "/");
+            Console.WriteLine("Extracted!");
+            a();
+        }catch(IOException)
+        {
+            Console.WriteLine("Failed To Extract! Retrying In 5 Seconds...");
+            retryextract();
+        }
     }
 
     static void a()
@@ -76,6 +83,12 @@ class Program
     {
         Console.WriteLine("Waiting...");
         Task.Delay(1000).ContinueWith(t => BeginMCMove());
+    }
+
+    static void retryextract()
+    {
+        Console.WriteLine("Wating...");
+        Task.Delay(5000).ContinueWith(t => ExtractPack());
     }
 
     static void GetUUID()
@@ -154,7 +167,7 @@ class Program
     static void onPackDownloaded(object obj, AsyncCompletedEventArgs args)
     {
         Console.WriteLine("File Downloaded Sucessfully!");
-        ExtractPack();
+        retryextract();
     }
 
     static void onPNGDownloaded(object obj, AsyncCompletedEventArgs args)
